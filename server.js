@@ -1,17 +1,13 @@
-import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require("express");
+const path = require("path");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
+
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Gemini init (API key ENV se aayegi)
-const genAI = new GoogleGenerativeAI(process.env. AIzaSyBIAMxhYvxoo_5PuCbsWPpN6PntH_r6E3I);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Home page
 app.get("/", (req, res) => {
@@ -24,7 +20,7 @@ app.post("/chat", async (req, res) => {
     const userMessage = req.body.message;
 
     if (!userMessage) {
-      return res.json({ reply: "Message missing hai" });
+      return res.json({ reply: "Message empty hai" });
     }
 
     const model = genAI.getGenerativeModel({
@@ -35,8 +31,8 @@ app.post("/chat", async (req, res) => {
     const reply = result.response.text();
 
     res.json({ reply });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Gemini Error:", error);
     res.json({ reply: "AI error aa gaya 😢" });
   }
 });
